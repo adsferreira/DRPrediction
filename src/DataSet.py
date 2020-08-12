@@ -14,6 +14,7 @@ import matplotlib.pyplot as plt
 from matplotlib.lines import Line2D
 from numpy import sort
 
+
 class DataSet:
     def __init__(self, path):
         self.path = path
@@ -107,9 +108,10 @@ class DataSet:
         return sio.loadmat(self.path + fileName)       
     
     def read_csv_file(self, fileName):
-        with open(self.path + fileName, 'rb') as f:
+        with open(self.path + fileName, 'r') as f:
             reader = csv.reader(f)
-            self.all_patterns = np.array(map(np.float64, list(reader)))                                
+            patterns_list = list(reader)
+            self.all_patterns = np.array(patterns_list).astype(np.float)
 #             patterns = np.vstack({tuple(row) for row in aux_p})
 #             nr_attr = patterns.shape[1]
 #             oh_pbg_ids = np.where(patterns[:, (nr_attr - 1)] == 0)
@@ -121,8 +123,8 @@ class DataSet:
 #         self.split_inputs_and_targets(3)
             
     def split_inputs_and_targets(self, delimiter_id):
-        self.inputs = self.all_patterns[:, :-delimiter_id]
-        self.targets = self.all_patterns[:, -delimiter_id:]       
+        self.inputs = np.array(self.all_patterns[:, :-delimiter_id])
+        self.targets = np.array(self.all_patterns[:, -delimiter_id:])    
                 
     def set_samples_from_mat_file(self, fileName):
         mat_ds = self.read_mat_file(fileName)

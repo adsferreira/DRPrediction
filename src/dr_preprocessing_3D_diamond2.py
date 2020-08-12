@@ -2,11 +2,11 @@ import os
 import numpy as np
 import csv
 
-prefix = "/home/adriano/Projects/ANNDispersionRelation/ann_training/second_case_study/"
-folder = prefix + "diamond2/16_interpolated_k_points/"
+prefix = "/home/adriano/Projects/ANNDispersionRelation/ann_training/3d/"
+folder = prefix + "diamond3/16_interpolated_points/"
 dr_files = []
 dataset = []
-orig_radius = 0.1
+orig_radius = 0.25
 
 dr_files += [dr_file for dr_file in os.listdir(folder) if dr_file.endswith('.dat')]
 dr_files.sort()
@@ -14,7 +14,7 @@ dr_files.sort()
 for f_name in dr_files:
     filename, file_extension = os.path.splitext(f_name)
     proportion_idx = filename.index('p')
-    proportion_str = filename[proportion_idx + 1:]
+    proportion_str = filename[proportion_idx + 8:]
     proportional_radius = orig_radius * float(proportion_str)
     
     # read file content
@@ -36,6 +36,6 @@ for f_name in dr_files:
         pattern = np.concatenate([param, mode])
         dataset.append(pattern)
         
-with open(folder + 'dr_diamond_pc_dataset.csv', 'wb') as myfile:
+with open(folder + 'dr_diamond3_pc_dataset.csv', 'wb') as myfile:
     wr = csv.writer(myfile, quoting=csv.QUOTE_ALL)
     wr.writerows(dataset)

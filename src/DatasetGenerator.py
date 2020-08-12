@@ -5,19 +5,18 @@ class DatasetGenerator():
     def __init__(self, pol, n_phcs, f_name, phc_param_val=dict()):
         self.polarization = pol
         self.nr_phcs = n_phcs
-        self.props = np.empty(n_phcs+1)
+        self.props = np.empty(n_phcs)
         self.f_name = f_name
         self.phc_param_val = phc_param_val
         self.is_linear = 0
         
     def set_linear_proportions(self, values):
-        self.props[0] = 1
-        self.props[1:] = np.array(values)
+        self.props = np.array(values)
         self.is_linear = 1   
              
     def set_randn_proportions(self):
         self.props[0] = 0
-        self.props[1:] = np.random.normal(size=self.nr_phcs) / 100
+        self.props[1:] = np.random.normal(size=self.nr_phcs) / 50
         self.is_linear = 0
         
     def generate_ds(self, ds_f_name):
@@ -31,7 +30,7 @@ class DatasetGenerator():
         patterns = []
                 
         if (self.is_linear):        
-            for prop in self.props[1:]:
+            for prop in self.props:
                 param_values = []
                 command = ['mpb']
                 # create parameter list and store current values
@@ -39,6 +38,8 @@ class DatasetGenerator():
                     command.append(key + '=' + str(value * prop))
                     param_values.append(str(value * prop))
                 
+                # add material data
+                #param_values.append('12')
                 # add ctl file to the mpb argument                                        
                 command.append(self.f_name)
                 # run mpb
@@ -116,17 +117,24 @@ prefix = '/home/adriano/Projects/ANNDispersionRelation/ann_training/'
 folders = [prefix + '2d/square/tm/', 
            prefix + '2d/square/te/tests_new_db/',
            prefix + '2d/square/complete/tm/', 
-           prefix + '2d/triangular/isotropic/air-columns/all_modes/random/',
+           prefix + '2d/triangular/isotropic/air_rods/tem/random/',
+           prefix + '2d/square/dielectric_veins/',
+           prefix + '2d/triangular/isotropic/air_rods/with_material/tm/',
+           prefix + '2d/triangular/tri_diel_rods/no_material/tm/',
            prefix + 'second_case_study/diamond2/16_interpolated_k_points/', 
-           prefix + 'second_case_study/sc5/']
+           prefix + 'second_case_study/sc5/',
+           prefix + '3d/diamond3/16_interpolated_points/',
+           prefix + '3d/fcc/diamond2/with_material/',
+           prefix + '3d/sc/spheres_cylindrical_veins/with_material/']
  
-folder_id = 3
+folder_id = 6
 prefix = folders[folder_id]
-f_name = prefix + 'one_rod_r_0.48.ctl'
-polarization = 'all'
-linear_props = [0.7, 0.8, 0.9, 1.0, 1.1, 1.2, 1.3, 0.5]
-phc_param_val = {'r': 0.48}
+f_name = prefix + 'tri_diel_rods_tm.ctl'
+polarization = 'tm'
+#linear_props = [0.7, 0.8, 0.9, 1.0, 1.1, 1.2, 1.3, 1.25]
+linear_props = [0.7]
+phc_param_val = {'r': 0.2}
 
-ds_gen = DatasetGenerator(polarization, 7, f_name, phc_param_val)
-ds_gen.set_randn_proportions()
-ds_gen.generate_ds(prefix + '4_interpolated_points/tri_one_rod_ds.csv')
+ds_gen = DatasetGenerator(polarization, len(linear_props), f_name, phc_param_val)
+ds_gen.set_linear_proportions(linear_props)
+ds_gen.generate_ds(prefix + 'ds/16_interpolated_points/tri_diel_rods_tm_newTest_p_0_7.csv')

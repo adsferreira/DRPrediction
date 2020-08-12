@@ -42,10 +42,10 @@ def train_ann(X_train, targets):
     return (elm, tr_mse)
 
 def load_model():
-    return joblib.load('models/6_12_17/elm/sc5/elm_120_sc5_pc.pkl') 
+    return joblib.load('models/2017/6_12_17/elm/sc5/elm_120_sc5_pc.pkl') 
             
-def predict(mlp, X_test):  
-    return mlp.predict(X_test)
+def predict(elm, X_test):  
+    return elm.predict(X_test)
 
 def save_estimatives(outputs):
     with open('test_elm_sc5_pc_outs.csv', 'wb') as myfile:
@@ -98,18 +98,20 @@ if __name__ == '__main__':
     if train:
         te_mse = 1
         while(te_mse > 5.01e-05):    
-            mlp, mse = train_ann(X_train, ds.targets)
-            outputs = predict(mlp, X_test)
+            elm, mse = train_ann(X_train, ds.targets)
+            outputs = predict(elm, X_test)
             te_mse = mean_squared_error(ds.targetsTesting, outputs)
             print("test mse: ", te_mse)
     else:
         elm = load_model()
         outputs = predict(elm, X_test)
-#         tr_mse = mean_squared_error(ds.targets, predict(elm, X_train))
-        te_mse = mean_squared_error(ds.targetsTesting, outputs)
-#         print("training mse: ", tr_mse)
-        print("test mse: ", te_mse)
+        te_mse1 = mean_squared_error(ds.targetsTesting[0:69], outputs[0:69])
+        te_mse2 = mean_squared_error(ds.targetsTesting[69:], outputs[69:])
+    
+        print("first test mse: ", te_mse1)
+        print("second test mse: ", te_mse2)
+        print("mean mse: ", (te_mse1 + te_mse2)/2)
        
-    save_estimatives(outputs) 
-    plot_results(ds.targetsTesting[0:69], outputs[0:69]) 
-    plot_results(ds.targetsTesting[69:], outputs[69:])
+    #save_estimatives(outputs) 
+    #plot_results(ds.targetsTesting[0:69], outputs[0:69]) 
+    #plot_results(ds.targetsTesting[69:], outputs[69:])
